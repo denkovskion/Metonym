@@ -1,0 +1,116 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2026 Ivan Denkovski
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package blog.art.chess.metonym;
+
+import blog.art.chess.metonym.parser.Parser;
+import blog.art.chess.metonym.problem.Problem;
+import java.util.List;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+class Metonym {
+
+  private static final Logger LOGGER = Logger.getLogger(Metonym.class.getName());
+
+  public static void main(String[] args) {
+    configureLogging();
+    boolean version = false;
+    boolean help = false;
+    boolean detailed = false;
+    boolean verbose = false;
+    for (String arg : args) {
+      if (arg.equals("--help")) {
+        help = true;
+      } else if (arg.equals("--version")) {
+        version = true;
+      } else if (arg.equals("--detailed")) {
+        detailed = true;
+      } else if (arg.equals("--verbose")) {
+        verbose = true;
+      } else if (arg.matches("-[hVdv]+")) {
+        for (char letter : arg.substring(1).toCharArray()) {
+          if (letter == 'h') {
+            help = true;
+          } else if (letter == 'V') {
+            version = true;
+          } else if (letter == 'd') {
+            detailed = true;
+          } else if (letter == 'v') {
+            verbose = true;
+          }
+        }
+      } else {
+        LOGGER.warning(String.format("Invalid argument: '%s'.", arg));
+        System.exit(1);
+      }
+    }
+    if (help) {
+      System.out.printf("Usage:%n" + "  java -jar Metonym.jar [OPTIONS]%n%n"
+          + "Chess mate searcher. Reads problems as EPD records (with one operation:%n"
+          + "  dm for mate search or acd for perft) until EOF, then solves them.%n%n" + "Options:%n"
+          + "  -h, --help       Show help and exit%n" + "  -V, --version    Show version and exit%n"
+          + "  -d, --detailed   Enable detailed analysis%n"
+          + "  -v, --verbose    Enable verbose logging%n");
+      System.exit(0);
+    }
+    if (version) {
+      System.out.printf("Metonym %s%n" + "Copyright (c) 2026 Ivan Denkovski%n" + "License: MIT%n",
+          getVersion());
+      System.exit(0);
+    }
+    LOGGER.info(String.format("Metonym %s Copyright (c) 2026 Ivan Denkovski", getVersion()));
+    List<Problem> problems = Parser.readAllProblems();
+    for (Problem problem : problems) {
+      problem.solve(detailed, verbose);
+    }
+  }
+
+  private static String getVersion() {
+    Package pkg = Metonym.class.getPackage();
+    if (pkg != null) {
+      String version = pkg.getImplementationVersion();
+      if (version != null) {
+        return version;
+      }
+      return "(development)";
+    }
+    return "(unknown)";
+  }
+
+  private static void configureLogging() {
+    Logger root = Logger.getLogger("");
+    Package pkg = Metonym.class.getPackage();
+    if (pkg != null) {
+      root.setLevel(Level.INFO);
+      Logger.getLogger(pkg.getName()).setLevel(Level.FINE);
+    } else {
+      root.setLevel(Level.FINE);
+    }
+    for (Handler handler : root.getHandlers()) {
+      handler.setLevel(Level.FINE);
+    }
+  }
+}
