@@ -46,8 +46,9 @@ public abstract class Problem implements Operation {
   }
 
   public void solve(boolean detailed, boolean verbose) {
-    System.out.printf("%s%n%s%n%n", String.join("", Collections.nCopies(42, "_")),
-        Position.formatToString(position, this));
+    System.out.println(String.join("", Collections.nCopies(42, "_")));
+    System.out.println(Position.formatToString(position, this));
+    System.out.println();
     LOGGER.info("Solving...");
     long begin = System.currentTimeMillis();
     List<Move> pseudoLegalMoves = new ArrayList<>();

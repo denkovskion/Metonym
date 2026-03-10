@@ -51,8 +51,8 @@ public final class ShortCastling implements Move {
     boolean result = position.makeMove(nullMove, null, null);
     position.unmakeMove();
     if (result) {
-      Move stopMove = new QuietMove(origin, target2);
-      result = position.makeMove(stopMove, null, null);
+      Move quietMove = new QuietMove(origin, target2);
+      result = position.makeMove(quietMove, null, null);
       position.unmakeMove();
     }
     position.getBoard().put(target, position.getBoard().remove(origin));

@@ -53,10 +53,10 @@ public abstract class Rider extends Piece {
             origin.getRank() + distance * direction.getRankOffset());
         if (target.getFile() >= 1 && target.getFile() <= 8 && target.getRank() >= 1
             && target.getRank() <= 8) {
-          Piece other = board.get(target);
-          if (other != null) {
-            if (other.black != black) {
-              if (other instanceof King) {
+          Piece captured = board.get(target);
+          if (captured != null) {
+            if (captured.black != black) {
+              if (captured instanceof King) {
                 return false;
               } else {
                 if (moves != null) {

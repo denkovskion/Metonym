@@ -118,8 +118,8 @@ public class Position {
           }
         }
         boolean terminal = true;
-        for (Move nextMove : pseudoLegalMovesNext) {
-          if (makeMove(nextMove, null, null)) {
+        for (Move moveNext : pseudoLegalMovesNext) {
+          if (makeMove(moveNext, null, null)) {
             terminal = false;
           }
           unmakeMove();
@@ -178,10 +178,8 @@ public class Position {
   }
 
   public static String formatToString(Position position, Operation operation) {
-    StringBuilder output = new StringBuilder();
-    Piece.doFormat(position.board, position.blackToMove, position.castlingOrigins,
-        position.enPassantTarget, operation, output);
-    return output.toString();
+    return Piece.formatToString(position.board, position.blackToMove, position.castlingOrigins,
+        position.enPassantTarget, operation);
   }
 
   @Override

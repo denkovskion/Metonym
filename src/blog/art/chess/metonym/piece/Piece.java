@@ -101,69 +101,69 @@ public abstract class Piece {
       }
     }
     if (enPassantTarget != null) {
-      Piece other = board.get(new Square(enPassantTarget.getFile(), blackToMove ? 4 : 5));
-      if (!(enPassantTarget.getRank() == (blackToMove ? 3 : 6) && other instanceof Pawn
-          && other.black != blackToMove && board.get(enPassantTarget) == null
+      Piece captured = board.get(new Square(enPassantTarget.getFile(), blackToMove ? 4 : 5));
+      if (!(enPassantTarget.getRank() == (blackToMove ? 3 : 6) && captured instanceof Pawn
+          && captured.black != blackToMove && board.get(enPassantTarget) == null
           && board.get(new Square(enPassantTarget.getFile(), blackToMove ? 2 : 7)) == null)) {
         throw new IllegalArgumentException("Not accepted en passant square");
       }
     }
   }
 
-  public static void doFormat(Map<Square, Piece> board, boolean blackToMove,
-      Set<Square> castlingOrigins, Square enPassantTarget, Operation operation,
-      StringBuilder output) {
+  public static String formatToString(Map<Square, Piece> board, boolean blackToMove,
+      Set<Square> castlingOrigins, Square enPassantTarget, Operation operation) {
+    List<String> args = new ArrayList<>();
     for (int rank = 8; rank >= 1; rank--) {
-      output.append(rank);
       for (int file = 1; file <= 8; file++) {
         Piece piece = board.get(new Square(file, rank));
-        output.append(' ').append(piece instanceof King ? (piece.black ? 'k' : 'K')
-            : piece instanceof Queen ? (piece.black ? 'q' : 'Q')
-                : piece instanceof Rook ? (piece.black ? 'r' : 'R')
-                    : piece instanceof Bishop ? (piece.black ? 'b' : 'B')
-                        : piece instanceof Knight ? (piece.black ? 'n' : 'N')
-                            : piece instanceof Pawn ? (piece.black ? 'p' : 'P') : '.');
+        args.add(piece instanceof King ? (piece.black ? "k" : "K")
+            : piece instanceof Queen ? (piece.black ? "q" : "Q")
+                : piece instanceof Rook ? (piece.black ? "r" : "R")
+                    : piece instanceof Bishop ? (piece.black ? "b" : "B")
+                        : piece instanceof Knight ? (piece.black ? "n" : "N")
+                            : piece instanceof Pawn ? (piece.black ? "p" : "P") : ".");
       }
       if (rank == 8) {
-        output.append("    Side to move: ").append(blackToMove ? 'b' : 'w');
+        args.add(blackToMove ? "b" : "w");
       } else if (rank == 7) {
-        output.append("    Castling rights: ");
         if (!castlingOrigins.isEmpty()) {
+          StringBuilder arg = new StringBuilder();
           if (castlingOrigins.contains(new Square(5, 1))) {
             if (castlingOrigins.contains(new Square(8, 1))) {
-              output.append('K');
+              arg.append("K");
             }
             if (castlingOrigins.contains(new Square(1, 1))) {
-              output.append('Q');
+              arg.append("Q");
             }
           }
           if (castlingOrigins.contains(new Square(5, 8))) {
             if (castlingOrigins.contains(new Square(8, 8))) {
-              output.append('k');
+              arg.append("k");
             }
             if (castlingOrigins.contains(new Square(1, 8))) {
-              output.append('q');
+              arg.append("q");
             }
           }
+          args.add(arg.toString());
         } else {
-          output.append('-');
+          args.add("-");
         }
       } else if (rank == 6) {
-        output.append("    En passant target: ");
         if (enPassantTarget != null) {
-          output.append((char) ('a' + enPassantTarget.getFile() - 1))
-              .append(enPassantTarget.getRank());
+          args.add("" + (char) ('a' + enPassantTarget.getFile() - 1) + (char) (
+              '1' + enPassantTarget.getRank() - 1));
         } else {
-          output.append('-');
+          args.add("-");
         }
       } else if (rank == 4) {
-        output.append("    ").append(operation.getSummary());
+        args.add(operation.getSummary());
       }
-      output.append(System.lineSeparator());
     }
-    output.append(' ');
-    for (char file = 'a'; file <= 'h'; file++) {
-      output.append(' ').append(file);
-    }
+    return String.format(("8 %s %s %s %s %s %s %s %s    Side to move: %s%n"
+            + "7 %s %s %s %s %s %s %s %s    Castling rights: %s%n"
+            + "6 %s %s %s %s %s %s %s %s    En passant target: %s%n" + "5 %s %s %s %s %s %s %s %s%n"
+            + "4 %s %s %s %s %s %s %s %s    %s%n" + "3 %s %s %s %s %s %s %s %s%n"
+            + "2 %s %s %s %s %s %s %s %s%n" + "1 %s %s %s %s %s %s %s %s%n" + "  a b c d e f g h"),
+        args.toArray());
   }
 }
