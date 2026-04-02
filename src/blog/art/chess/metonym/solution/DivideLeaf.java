@@ -26,42 +26,28 @@ package blog.art.chess.metonym.solution;
 
 import blog.art.chess.metonym.move.Move;
 import blog.art.chess.metonym.position.Position;
-import java.util.List;
 import java.util.StringJoiner;
 
-public final class CountNode extends Node {
+public final class DivideLeaf extends Node {
 
   private final Move move;
   private final long count;
-  private final List<Node> children;
 
-  public CountNode(Move move, long count, List<Node> children) {
+  public DivideLeaf(Move move, long count) {
     this.move = move;
     this.count = count;
-    this.children = children;
   }
 
   @Override
   protected void doFormat(Position position, StringBuilder output, int moveNo, boolean inline) {
-    if (move != null) {
-      position.makeMove(move, null, output);
-      output.append(" ");
-    }
-    if (children != null) {
-      for (Node child : children) {
-        child.doFormat(position, output, moveNo, false);
-        output.append(System.lineSeparator());
-      }
-    }
-    output.append(count);
-    if (move != null) {
-      position.unmakeMove();
-    }
+    position.makeMove(move, null, output);
+    output.append(" ").append(count);
+    position.unmakeMove();
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", CountNode.class.getSimpleName() + "[", "]").add("move=" + move)
-        .add("count=" + count).add("children=" + children).toString();
+    return new StringJoiner(", ", DivideLeaf.class.getSimpleName() + "[", "]").add("move=" + move)
+        .add("count=" + count).toString();
   }
 }

@@ -25,6 +25,7 @@
 package blog.art.chess.metonym.problem;
 
 import blog.art.chess.metonym.move.Move;
+import blog.art.chess.metonym.move.NullMove;
 import blog.art.chess.metonym.position.Position;
 import blog.art.chess.metonym.solution.MateBranch;
 import blog.art.chess.metonym.solution.MateLeaf;
@@ -48,7 +49,8 @@ public class MateSearch extends Problem {
   }
 
   @Override
-  protected Node doSolve(List<Move> pseudoLegalMoves, boolean detailed, boolean verbose) {
+  protected Node doSolve(Position position, List<Move> pseudoLegalMoves, boolean detailed,
+      boolean verbose) {
     List<Node> nodes = analyse(nMoves, position, pseudoLegalMoves, detailed, verbose);
     return new MateRoot(nodes);
   }
@@ -103,9 +105,9 @@ public class MateSearch extends Problem {
 
   private static int searchMax(int nMoves, Position position, List<Move> pseudoLegalMovesMax) {
     int max = -1;
-    for (Move move : pseudoLegalMovesMax) {
+    for (Move moveMax : pseudoLegalMovesMax) {
       List<Move> pseudoLegalMovesMin = new ArrayList<>();
-      if (position.makeMove(move, pseudoLegalMovesMin, null)) {
+      if (position.makeMove(moveMax, pseudoLegalMovesMin, null)) {
         int min = searchMin(nMoves, position, pseudoLegalMovesMin);
         if (min > max) {
           max = min;
@@ -122,8 +124,8 @@ public class MateSearch extends Problem {
   private static int searchMin(int nMoves, Position position, List<Move> pseudoLegalMovesMin) {
     int min = 0;
     if (nMoves == 1) {
-      for (Move move : pseudoLegalMovesMin) {
-        if (position.makeMove(move, null, null)) {
+      for (Move moveMin : pseudoLegalMovesMin) {
+        if (position.makeMove(moveMin, null, null)) {
           min = -1;
         }
         position.unmakeMove();
@@ -132,9 +134,9 @@ public class MateSearch extends Problem {
         }
       }
     } else {
-      for (Move move : pseudoLegalMovesMin) {
+      for (Move moveMin : pseudoLegalMovesMin) {
         List<Move> pseudoLegalMovesMax = new ArrayList<>();
-        if (position.makeMove(move, pseudoLegalMovesMax, null)) {
+        if (position.makeMove(moveMin, pseudoLegalMovesMax, null)) {
           int max = searchMax(nMoves - 1, position, pseudoLegalMovesMax);
           if (min == 0 || max < min) {
             min = max;
@@ -147,7 +149,9 @@ public class MateSearch extends Problem {
       }
     }
     if (min == 0) {
-      min = position.isCheck() ? nMoves : -1;
+      Move nullMove = new NullMove();
+      min = position.makeMove(nullMove, null, null) ? -1 : nMoves;
+      position.unmakeMove();
     }
     return min;
   }
@@ -160,6 +164,6 @@ public class MateSearch extends Problem {
   @Override
   public String toString() {
     return new StringJoiner(", ", MateSearch.class.getSimpleName() + "[", "]").add(
-        "nMoves=" + nMoves).add("position=" + position).toString();
+        "nMoves=" + nMoves).add(super.toString()).toString();
   }
 }

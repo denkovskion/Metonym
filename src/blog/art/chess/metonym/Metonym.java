@@ -37,8 +37,8 @@ class Metonym {
 
   public static void main(String[] args) {
     configureLogging();
-    boolean version = false;
     boolean help = false;
+    boolean version = false;
     boolean detailed = false;
     boolean verbose = false;
     for (String arg : args) {
@@ -70,7 +70,7 @@ class Metonym {
     if (help) {
       System.out.printf("Usage:%n" + "  java -jar Metonym.jar [OPTIONS]%n%n"
           + "Chess mate searcher. Reads problems as EPD records (with one operation:%n"
-          + "  dm for mate search or acd for perft) until EOF, then solves them.%n%n" + "Options:%n"
+          + "  dm for direct mate or acd for perft) until EOF, then solves them.%n%n" + "Options:%n"
           + "  -h, --help       Show help and exit%n" + "  -V, --version    Show version and exit%n"
           + "  -d, --detailed   Enable detailed analysis%n"
           + "  -v, --verbose    Enable verbose logging%n");

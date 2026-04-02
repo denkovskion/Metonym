@@ -48,11 +48,11 @@ public final class LongCastling implements Move {
       lanBuilder.append("0-0-0");
     }
     Move nullMove = new NullMove();
-    boolean result = position.makeMove(nullMove, null, null);
+    boolean preLegal = position.makeMove(nullMove, null, null);
     position.unmakeMove();
-    if (result) {
+    if (preLegal) {
       Move quietMove = new QuietMove(origin, target2);
-      result = position.makeMove(quietMove, null, null);
+      preLegal = position.makeMove(quietMove, null, null);
       position.unmakeMove();
     }
     position.getBoard().put(target, position.getBoard().remove(origin));
@@ -60,7 +60,7 @@ public final class LongCastling implements Move {
     position.getCastlingOrigins().remove(origin);
     position.getCastlingOrigins().remove(origin2);
     position.setEnPassantTarget(null);
-    return result;
+    return preLegal;
   }
 
   @Override

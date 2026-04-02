@@ -25,7 +25,6 @@
 package blog.art.chess.metonym.problem;
 
 import blog.art.chess.metonym.move.Move;
-import blog.art.chess.metonym.position.Operation;
 import blog.art.chess.metonym.position.Position;
 import blog.art.chess.metonym.solution.IllegalNode;
 import blog.art.chess.metonym.solution.Node;
@@ -35,11 +34,11 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.logging.Logger;
 
-public abstract class Problem implements Operation {
+public abstract class Problem {
 
   private static final Logger LOGGER = Logger.getLogger(Problem.class.getName());
 
-  protected final Position position;
+  private final Position position;
 
   protected Problem(Position position) {
     this.position = position;
@@ -47,14 +46,14 @@ public abstract class Problem implements Operation {
 
   public void solve(boolean detailed, boolean verbose) {
     System.out.println(String.join("", Collections.nCopies(42, "_")));
-    System.out.println(Position.formatToString(position, this));
+    System.out.println(Position.formatToString(position, getSummary()));
     System.out.println();
-    LOGGER.info("Solving...");
+    LOGGER.info(detailed ? "Solving with analysis..." : "Solving...");
     long begin = System.currentTimeMillis();
     List<Move> pseudoLegalMoves = new ArrayList<>();
     Node solution;
     if (position.isLegal(pseudoLegalMoves)) {
-      solution = doSolve(pseudoLegalMoves, detailed, verbose);
+      solution = doSolve(position, pseudoLegalMoves, detailed, verbose);
     } else {
       solution = new IllegalNode();
     }
@@ -63,7 +62,10 @@ public abstract class Problem implements Operation {
     LOGGER.info(String.format("Finished solving in %dms.", end - begin));
   }
 
-  protected abstract Node doSolve(List<Move> pseudoLegalMoves, boolean detailed, boolean verbose);
+  protected abstract Node doSolve(Position position, List<Move> pseudoLegalMoves, boolean detailed,
+      boolean verbose);
+
+  protected abstract String getSummary();
 
   @Override
   public String toString() {

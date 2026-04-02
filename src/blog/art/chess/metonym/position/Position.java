@@ -170,14 +170,7 @@ public class Position {
     board = state.getBoard();
   }
 
-  public boolean isCheck() {
-    Move nullMove = new NullMove();
-    boolean check = !makeMove(nullMove, null, null);
-    unmakeMove();
-    return check;
-  }
-
-  public static String formatToString(Position position, Operation operation) {
+  public static String formatToString(Position position, String operation) {
     return Piece.formatToString(position.board, position.blackToMove, position.castlingOrigins,
         position.enPassantTarget, operation);
   }

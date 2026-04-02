@@ -22,9 +22,27 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.metonym.position;
+package blog.art.chess.metonym.solution;
 
-public interface Operation {
+import blog.art.chess.metonym.position.Position;
+import java.util.StringJoiner;
 
-  String getSummary();
+public final class PerftNode extends Node {
+
+  private final long count;
+
+  public PerftNode(long count) {
+    this.count = count;
+  }
+
+  @Override
+  protected void doFormat(Position position, StringBuilder output, int moveNo, boolean inline) {
+    output.append(count);
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", PerftNode.class.getSimpleName() + "[", "]").add("count=" + count)
+        .toString();
+  }
 }

@@ -26,8 +26,10 @@ package blog.art.chess.metonym.problem;
 
 import blog.art.chess.metonym.move.Move;
 import blog.art.chess.metonym.position.Position;
-import blog.art.chess.metonym.solution.CountNode;
+import blog.art.chess.metonym.solution.DivideLeaf;
+import blog.art.chess.metonym.solution.DivideRoot;
 import blog.art.chess.metonym.solution.Node;
+import blog.art.chess.metonym.solution.PerftNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
@@ -45,10 +47,11 @@ public class Perft extends Problem {
   }
 
   @Override
-  protected Node doSolve(List<Move> pseudoLegalMoves, boolean detailed, boolean verbose) {
+  protected Node doSolve(Position position, List<Move> pseudoLegalMoves, boolean detailed,
+      boolean verbose) {
     List<Node> nodes = detailed ? new ArrayList<>() : null;
     long nNodes = count(nPlies, position, pseudoLegalMoves, nodes, verbose);
-    return new CountNode(null, nNodes, nodes);
+    return detailed ? new DivideRoot(nNodes, nodes) : new PerftNode(nNodes);
   }
 
   private static long count(int nPlies, Position position, List<Move> pseudoLegalMoves,
@@ -63,7 +66,7 @@ public class Perft extends Problem {
       if (position.makeMove(move, pseudoLegalMovesNext, lanBuilder)) {
         long nChildNodes = count(nPlies - 1, position, pseudoLegalMovesNext, null, false);
         if (nodes != null) {
-          nodes.add(new CountNode(move, nChildNodes, null));
+          nodes.add(new DivideLeaf(move, nChildNodes));
         }
         nNodes += nChildNodes;
         if (verbose) {
@@ -87,6 +90,6 @@ public class Perft extends Problem {
   @Override
   public String toString() {
     return new StringJoiner(", ", Perft.class.getSimpleName() + "[", "]").add("nPlies=" + nPlies)
-        .add("position=" + position).toString();
+        .add(super.toString()).toString();
   }
 }

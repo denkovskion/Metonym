@@ -26,7 +26,6 @@ package blog.art.chess.metonym.piece;
 
 import blog.art.chess.metonym.move.Move;
 import blog.art.chess.metonym.position.Direction;
-import blog.art.chess.metonym.position.Operation;
 import blog.art.chess.metonym.position.Section;
 import blog.art.chess.metonym.position.Square;
 import java.util.ArrayList;
@@ -111,7 +110,7 @@ public abstract class Piece {
   }
 
   public static String formatToString(Map<Square, Piece> board, boolean blackToMove,
-      Set<Square> castlingOrigins, Square enPassantTarget, Operation operation) {
+      Set<Square> castlingOrigins, Square enPassantTarget, String operation) {
     List<String> args = new ArrayList<>();
     for (int rank = 8; rank >= 1; rank--) {
       for (int file = 1; file <= 8; file++) {
@@ -156,14 +155,14 @@ public abstract class Piece {
           args.add("-");
         }
       } else if (rank == 4) {
-        args.add(operation.getSummary());
+        args.add(operation);
       }
     }
-    return String.format(("8 %s %s %s %s %s %s %s %s    Side to move: %s%n"
+    return String.format("8 %s %s %s %s %s %s %s %s    Side to move: %s%n"
             + "7 %s %s %s %s %s %s %s %s    Castling rights: %s%n"
             + "6 %s %s %s %s %s %s %s %s    En passant target: %s%n" + "5 %s %s %s %s %s %s %s %s%n"
             + "4 %s %s %s %s %s %s %s %s    %s%n" + "3 %s %s %s %s %s %s %s %s%n"
-            + "2 %s %s %s %s %s %s %s %s%n" + "1 %s %s %s %s %s %s %s %s%n" + "  a b c d e f g h"),
+            + "2 %s %s %s %s %s %s %s %s%n" + "1 %s %s %s %s %s %s %s %s%n" + "  a b c d e f g h",
         args.toArray());
   }
 }
