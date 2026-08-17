@@ -39,15 +39,22 @@ public final class QuietMove implements Move {
   }
 
   @Override
-  public boolean doMake(Position position, StringBuilder lanBuilder) {
-    if (lanBuilder != null) {
-      lanBuilder.append(position.getBoard().get(origin).getLanCode()).append(origin.getLanCode())
-          .append("-").append(target.getLanCode());
-    }
+  public void preWrite(Position position, StringBuilder lanBuilder) {
+    lanBuilder.append(position.getBoard().get(origin).getLanCode()).append(origin.getLanCode())
+        .append("-").append(target.getLanCode());
+  }
+
+  @Override
+  public boolean preMake(Position position) {
+    return true;
+  }
+
+  @Override
+  public void updateState(Position position) {
     position.getBoard().put(target, position.getBoard().remove(origin));
     position.getCastlingOrigins().remove(origin);
     position.setEnPassantTarget(null);
-    return true;
+    position.setBlackToMove(!position.isBlackToMove());
   }
 
   @Override

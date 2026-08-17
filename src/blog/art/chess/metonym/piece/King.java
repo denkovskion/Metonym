@@ -49,9 +49,9 @@ public final class King extends Leaper {
   }
 
   @Override
-  public boolean generateMoves(Square origin, Map<Square, Piece> board, Map<Section, Piece> box,
+  public boolean generateMoves(Map<Square, Piece> board, Square origin, Map<Section, Piece> box,
       Set<Square> castlingOrigins, Square enPassantTarget, List<Move> moves) {
-    if (!super.generateMoves(origin, board, box, castlingOrigins, enPassantTarget, moves)) {
+    if (!super.generateMoves(board, origin, box, castlingOrigins, enPassantTarget, moves)) {
       return false;
     }
     if (castlingOrigins.contains(origin)) {

@@ -44,7 +44,7 @@ public abstract class Rider extends Piece {
   protected abstract Set<Direction> getRides();
 
   @Override
-  public boolean generateMoves(Square origin, Map<Square, Piece> board, Map<Section, Piece> box,
+  public boolean generateMoves(Map<Square, Piece> board, Square origin, Map<Section, Piece> box,
       Set<Square> castlingOrigins, Square enPassantTarget, List<Move> moves) {
     List<Direction> directions = DIRECTIONS.computeIfAbsent(getRides(), Piece::computeDirections);
     for (Direction direction : directions) {

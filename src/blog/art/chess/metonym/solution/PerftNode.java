@@ -27,7 +27,7 @@ package blog.art.chess.metonym.solution;
 import blog.art.chess.metonym.position.Position;
 import java.util.StringJoiner;
 
-public final class PerftNode extends Node {
+public final class PerftNode implements Node {
 
   private final long count;
 
@@ -36,8 +36,8 @@ public final class PerftNode extends Node {
   }
 
   @Override
-  protected void doFormat(Position position, StringBuilder output, int moveNo, boolean inline) {
-    output.append(count);
+  public String toFormattedString(Position position, int moveNo, boolean inline) {
+    return String.valueOf(count);
   }
 
   @Override

@@ -46,7 +46,7 @@ public abstract class Problem {
 
   public void solve(boolean detailed, boolean verbose) {
     System.out.println(String.join("", Collections.nCopies(42, "_")));
-    System.out.println(Position.formatToString(position, getSummary()));
+    System.out.println(position.toFormattedString(getSummary()));
     System.out.println();
     LOGGER.info(detailed ? "Solving with analysis..." : "Solving...");
     long begin = System.currentTimeMillis();
@@ -57,7 +57,7 @@ public abstract class Problem {
     } else {
       solution = new IllegalNode();
     }
-    System.out.println(Node.formatToString(solution, position));
+    System.out.println(solution.toFormattedString(position, 1, false));
     long end = System.currentTimeMillis();
     LOGGER.info(String.format("Finished solving in %dms.", end - begin));
   }

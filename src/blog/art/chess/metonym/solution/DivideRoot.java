@@ -28,7 +28,7 @@ import blog.art.chess.metonym.position.Position;
 import java.util.List;
 import java.util.StringJoiner;
 
-public final class DivideRoot extends Node {
+public final class DivideRoot implements Node {
 
   private final long count;
   private final List<Node> children;
@@ -39,12 +39,14 @@ public final class DivideRoot extends Node {
   }
 
   @Override
-  protected void doFormat(Position position, StringBuilder output, int moveNo, boolean inline) {
+  public String toFormattedString(Position position, int moveNo, boolean inline) {
+    StringBuilder output = new StringBuilder();
     for (Node child : children) {
-      child.doFormat(position, output, moveNo, false);
+      output.append(child.toFormattedString(position, moveNo, false));
       output.append(System.lineSeparator());
     }
     output.append(count);
+    return output.toString();
   }
 
   @Override

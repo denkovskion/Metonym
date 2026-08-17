@@ -28,7 +28,7 @@ import blog.art.chess.metonym.move.Move;
 import blog.art.chess.metonym.position.Position;
 import java.util.StringJoiner;
 
-public final class DivideLeaf extends Node {
+public final class DivideLeaf implements Node {
 
   private final Move move;
   private final long count;
@@ -39,10 +39,12 @@ public final class DivideLeaf extends Node {
   }
 
   @Override
-  protected void doFormat(Position position, StringBuilder output, int moveNo, boolean inline) {
+  public String toFormattedString(Position position, int moveNo, boolean inline) {
+    StringBuilder output = new StringBuilder();
     position.makeMove(move, null, output);
     output.append(" ").append(count);
     position.unmakeMove();
+    return output.toString();
   }
 
   @Override

@@ -33,12 +33,19 @@ public final class NullMove implements Move {
   }
 
   @Override
-  public boolean doMake(Position position, StringBuilder lanBuilder) {
-    if (lanBuilder != null) {
-      lanBuilder.append((String) null);
-    }
-    position.setEnPassantTarget(null);
+  public void preWrite(Position position, StringBuilder lanBuilder) {
+    lanBuilder.append((String) null);
+  }
+
+  @Override
+  public boolean preMake(Position position) {
     return true;
+  }
+
+  @Override
+  public void updateState(Position position) {
+    position.setEnPassantTarget(null);
+    position.setBlackToMove(!position.isBlackToMove());
   }
 
   @Override

@@ -41,15 +41,22 @@ public final class EnPassant implements Move {
   }
 
   @Override
-  public boolean doMake(Position position, StringBuilder lanBuilder) {
-    if (lanBuilder != null) {
-      lanBuilder.append(position.getBoard().get(origin).getLanCode()).append(origin.getLanCode())
-          .append("x").append(target.getLanCode()).append(" e.p.");
-    }
+  public void preWrite(Position position, StringBuilder lanBuilder) {
+    lanBuilder.append(position.getBoard().get(origin).getLanCode()).append(origin.getLanCode())
+        .append("x").append(target.getLanCode()).append(" e.p.");
+  }
+
+  @Override
+  public boolean preMake(Position position) {
+    return true;
+  }
+
+  @Override
+  public void updateState(Position position) {
     position.getBoard().remove(stop);
     position.getBoard().put(target, position.getBoard().remove(origin));
     position.setEnPassantTarget(null);
-    return true;
+    position.setBlackToMove(!position.isBlackToMove());
   }
 
   @Override

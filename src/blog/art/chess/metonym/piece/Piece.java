@@ -49,7 +49,7 @@ public abstract class Piece {
     return black;
   }
 
-  public abstract boolean generateMoves(Square origin, Map<Square, Piece> board,
+  public abstract boolean generateMoves(Map<Square, Piece> board, Square origin,
       Map<Section, Piece> box, Set<Square> castlingOrigins, Square enPassantTarget,
       List<Move> moves);
 

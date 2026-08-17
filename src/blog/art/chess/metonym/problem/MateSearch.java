@@ -58,22 +58,22 @@ public class MateSearch extends Problem {
   private static List<Node> analyse(int nMoves, Position position, List<Move> pseudoLegalMoves,
       boolean detailed, boolean verbose) {
     List<Node> nodes = new ArrayList<>();
-    for (Move moveMax : pseudoLegalMoves) {
-      List<Move> pseudoLegalMovesMin = new ArrayList<>();
-      StringBuilder lanBuilder = verbose ? new StringBuilder() : null;
-      if (position.makeMove(moveMax, pseudoLegalMovesMin, lanBuilder)) {
-        int min = searchMin(nMoves, position, pseudoLegalMovesMin);
-        if (min > 0) {
-          int distanceMax = nMoves - min + 1;
-          if (verbose) {
-            LOGGER.fine(String.format("Tried '%s'. Found mate in %d.", lanBuilder, distanceMax));
-          }
-          if (detailed) {
+    if (detailed) {
+      for (Move moveMax : pseudoLegalMoves) {
+        List<Move> pseudoLegalMovesMin = new ArrayList<>();
+        StringBuilder lanBuilder = verbose ? new StringBuilder() : null;
+        if (position.makeMove(moveMax, pseudoLegalMovesMin, lanBuilder)) {
+          int min = searchMin(position, nMoves, pseudoLegalMovesMin, true);
+          if (min > 0) {
+            int distanceMax = nMoves - min + 1;
+            if (verbose) {
+              LOGGER.fine(String.format("Tried '%s'. Found mate in %d.", lanBuilder, distanceMax));
+            }
             List<Node> nodesMin = new ArrayList<>();
             for (Move moveMin : pseudoLegalMovesMin) {
               List<Move> pseudoLegalMovesMax = new ArrayList<>();
               if (position.makeMove(moveMin, pseudoLegalMovesMax, null)) {
-                int max = searchMax(distanceMax - 1, position, pseudoLegalMovesMax);
+                int max = searchMax(position, distanceMax - 1, pseudoLegalMovesMax, true);
                 int distanceMin = distanceMax - max;
                 List<Node> nodesMax = analyse(distanceMin, position, pseudoLegalMovesMax, true,
                     false);
@@ -88,40 +88,60 @@ public class MateSearch extends Problem {
               LOGGER.fine(String.format("Finished analysis of '%s'.", lanBuilder));
             }
           } else {
-            nodes.add(new MateLeaf(moveMax, distanceMax));
-          }
-        } else {
-          if (verbose) {
-            LOGGER.fine(String.format("Tried '%s'. No mate in %d.", lanBuilder, nMoves));
+            if (verbose) {
+              LOGGER.fine(String.format("Tried '%s'. No mate in %d.", lanBuilder, nMoves));
+            }
           }
         }
+        position.unmakeMove();
       }
-      position.unmakeMove();
+      nodes.sort(Comparator.comparingInt(node -> ((MateBranch) node).getDistance()));
+    } else {
+      for (Move moveMax : pseudoLegalMoves) {
+        List<Move> pseudoLegalMovesMin = new ArrayList<>();
+        StringBuilder lanBuilder = verbose ? new StringBuilder() : null;
+        if (position.makeMove(moveMax, pseudoLegalMovesMin, lanBuilder)) {
+          int depth = 1;
+          for (; depth <= nMoves; depth++) {
+            if (searchMin(position, depth, pseudoLegalMovesMin, false) == 1) {
+              nodes.add(new MateLeaf(moveMax, depth));
+              break;
+            }
+          }
+          if (verbose) {
+            LOGGER.fine(
+                depth <= nMoves ? String.format("Tried '%s'. Found mate in %d.", lanBuilder, depth)
+                    : String.format("Tried '%s'. No mate in %d.", lanBuilder, nMoves));
+          }
+        }
+        position.unmakeMove();
+      }
+      nodes.sort(Comparator.comparingInt(node -> ((MateLeaf) node).getDistance()));
     }
-    nodes.sort(Comparator.comparingInt(
-        node -> detailed ? ((MateBranch) node).getDistance() : ((MateLeaf) node).getDistance()));
     return nodes;
   }
 
-  private static int searchMax(int nMoves, Position position, List<Move> pseudoLegalMovesMax) {
+  private static int searchMax(Position position, int nMoves, List<Move> pseudoLegalMovesMax,
+      boolean detailed) {
     int max = -1;
     for (Move moveMax : pseudoLegalMovesMax) {
       List<Move> pseudoLegalMovesMin = new ArrayList<>();
       if (position.makeMove(moveMax, pseudoLegalMovesMin, null)) {
-        int min = searchMin(nMoves, position, pseudoLegalMovesMin);
+        int min = searchMin(position, nMoves, pseudoLegalMovesMin, detailed);
         if (min > max) {
           max = min;
         }
       }
       position.unmakeMove();
-      if (max == nMoves) {
+      if (max == (detailed ? nMoves : 1)) {
         break;
       }
     }
     return max;
   }
 
-  private static int searchMin(int nMoves, Position position, List<Move> pseudoLegalMovesMin) {
+  private static int searchMin(Position position, int nMoves, List<Move> pseudoLegalMovesMin,
+      boolean detailed) {
     int min = 0;
     if (nMoves == 1) {
       for (Move moveMin : pseudoLegalMovesMin) {
@@ -137,7 +157,7 @@ public class MateSearch extends Problem {
       for (Move moveMin : pseudoLegalMovesMin) {
         List<Move> pseudoLegalMovesMax = new ArrayList<>();
         if (position.makeMove(moveMin, pseudoLegalMovesMax, null)) {
-          int max = searchMax(nMoves - 1, position, pseudoLegalMovesMax);
+          int max = searchMax(position, nMoves - 1, pseudoLegalMovesMax, detailed);
           if (min == 0 || max < min) {
             min = max;
           }
@@ -150,14 +170,14 @@ public class MateSearch extends Problem {
     }
     if (min == 0) {
       Move nullMove = new NullMove();
-      min = position.makeMove(nullMove, null, null) ? -1 : nMoves;
+      min = position.makeMove(nullMove, null, null) ? -1 : detailed ? nMoves : 1;
       position.unmakeMove();
     }
     return min;
   }
 
   @Override
-  public String getSummary() {
+  protected String getSummary() {
     return String.format("Mate in %d", nMoves);
   }
 

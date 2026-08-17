@@ -28,7 +28,7 @@ import blog.art.chess.metonym.position.Position;
 import java.util.List;
 import java.util.StringJoiner;
 
-public final class MateRoot extends Node {
+public final class MateRoot implements Node {
 
   private final List<Node> children;
 
@@ -37,15 +37,17 @@ public final class MateRoot extends Node {
   }
 
   @Override
-  protected void doFormat(Position position, StringBuilder output, int moveNo, boolean inline) {
+  public String toFormattedString(Position position, int moveNo, boolean inline) {
+    StringBuilder output = new StringBuilder();
     boolean first = true;
     for (Node child : children) {
       if (!first) {
         output.append(System.lineSeparator());
       }
-      child.doFormat(position, output, moveNo, false);
+      output.append(child.toFormattedString(position, moveNo, false));
       first = false;
     }
+    return output.toString();
   }
 
   @Override

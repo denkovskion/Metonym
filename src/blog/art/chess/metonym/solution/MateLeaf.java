@@ -28,7 +28,7 @@ import blog.art.chess.metonym.move.Move;
 import blog.art.chess.metonym.position.Position;
 import java.util.StringJoiner;
 
-public final class MateLeaf extends Node {
+public final class MateLeaf implements Node {
 
   private final Move move;
   private final int distance;
@@ -43,10 +43,12 @@ public final class MateLeaf extends Node {
   }
 
   @Override
-  protected void doFormat(Position position, StringBuilder output, int moveNo, boolean inline) {
+  public String toFormattedString(Position position, int moveNo, boolean inline) {
+    StringBuilder output = new StringBuilder();
     position.makeMove(move, null, output);
     output.append(" [#").append(distance).append("]");
     position.unmakeMove();
+    return output.toString();
   }
 
   @Override

@@ -42,17 +42,24 @@ public final class PromotionCapture implements Move {
   }
 
   @Override
-  public boolean doMake(Position position, StringBuilder lanBuilder) {
-    if (lanBuilder != null) {
-      lanBuilder.append(position.getBoard().get(origin).getLanCode()).append(origin.getLanCode())
-          .append("x").append(target.getLanCode()).append("=")
-          .append(position.getBox().get(section).getLanCode());
-    }
+  public void preWrite(Position position, StringBuilder lanBuilder) {
+    lanBuilder.append(position.getBoard().get(origin).getLanCode()).append(origin.getLanCode())
+        .append("x").append(target.getLanCode()).append("=")
+        .append(position.getBox().get(section).getLanCode());
+  }
+
+  @Override
+  public boolean preMake(Position position) {
+    return true;
+  }
+
+  @Override
+  public void updateState(Position position) {
     position.getBoard().remove(origin);
     position.getBoard().replace(target, position.getBox().get(section));
     position.getCastlingOrigins().remove(target);
     position.setEnPassantTarget(null);
-    return true;
+    position.setBlackToMove(!position.isBlackToMove());
   }
 
   @Override

@@ -75,6 +75,10 @@ public class Position {
     return blackToMove;
   }
 
+  public void setBlackToMove(boolean blackToMove) {
+    this.blackToMove = blackToMove;
+  }
+
   public Set<Square> getCastlingOrigins() {
     return castlingOrigins;
   }
@@ -87,7 +91,7 @@ public class Position {
     for (Square origin : board.keySet()) {
       Piece piece = board.get(origin);
       if (piece.isBlack() == blackToMove) {
-        if (!piece.generateMoves(origin, board, box, castlingOrigins, enPassantTarget,
+        if (!piece.generateMoves(board, origin, box, castlingOrigins, enPassantTarget,
             pseudoLegalMoves)) {
           return false;
         }
@@ -97,69 +101,26 @@ public class Position {
   }
 
   public boolean makeMove(Move move, List<Move> pseudoLegalMoves, StringBuilder lanBuilder) {
-    memory.addFirst(new State(new TreeMap<>(board), blackToMove, new HashSet<>(castlingOrigins),
-        enPassantTarget));
-    boolean legal = move.doMake(this, lanBuilder);
-    blackToMove = !blackToMove;
-    if (legal) {
-      legal = isLegal(pseudoLegalMoves);
-    }
     if (lanBuilder != null) {
-      if (legal) {
-        List<Move> pseudoLegalMovesNext = pseudoLegalMoves;
-        if (pseudoLegalMovesNext == null) {
-          pseudoLegalMovesNext = new ArrayList<>();
-          for (Square origin : board.keySet()) {
-            Piece piece = board.get(origin);
-            if (piece.isBlack() == blackToMove) {
-              piece.generateMoves(origin, board, box, castlingOrigins, enPassantTarget,
-                  pseudoLegalMovesNext);
-            }
-          }
+      move.preWrite(this, lanBuilder);
+    }
+    boolean preLegal = move.preMake(this);
+    doMakeMove(move);
+    if (preLegal) {
+      if (isLegal(pseudoLegalMoves)) {
+        if (lanBuilder != null) {
+          postWrite(pseudoLegalMoves, lanBuilder);
         }
-        boolean terminal = true;
-        for (Move moveNext : pseudoLegalMovesNext) {
-          if (makeMove(moveNext, null, null)) {
-            terminal = false;
-          }
-          unmakeMove();
-          if (!terminal) {
-            break;
-          }
-        }
-        int nChecks = 0;
-        Move nullMove = new NullMove();
-        makeMove(nullMove, null, null);
-        for (Square origin : board.keySet()) {
-          Piece piece = board.get(origin);
-          if (piece.isBlack() == blackToMove) {
-            if (!piece.generateMoves(origin, board, box, castlingOrigins, enPassantTarget, null)) {
-              nChecks++;
-            }
-          }
-        }
-        unmakeMove();
-        if (terminal) {
-          if (nChecks > 0) {
-            if (nChecks > 1) {
-              for (int i = 0; i < nChecks; i++) {
-                lanBuilder.append("+");
-              }
-            }
-            lanBuilder.append("#");
-          } else {
-            lanBuilder.append("=");
-          }
-        } else {
-          if (nChecks > 0) {
-            for (int i = 0; i < nChecks; i++) {
-              lanBuilder.append("+");
-            }
-          }
-        }
+        return true;
       }
     }
-    return legal;
+    return false;
+  }
+
+  private void doMakeMove(Move move) {
+    memory.addFirst(new State(new TreeMap<>(board), blackToMove, new HashSet<>(castlingOrigins),
+        enPassantTarget));
+    move.updateState(this);
   }
 
   public void unmakeMove() {
@@ -170,9 +131,62 @@ public class Position {
     board = state.getBoard();
   }
 
-  public static String formatToString(Position position, String operation) {
-    return Piece.formatToString(position.board, position.blackToMove, position.castlingOrigins,
-        position.enPassantTarget, operation);
+  private void postWrite(List<Move> pseudoLegalMoves, StringBuilder lanBuilder) {
+    List<Move> pseudoLegalMovesNext = pseudoLegalMoves;
+    if (pseudoLegalMovesNext == null) {
+      pseudoLegalMovesNext = new ArrayList<>();
+      for (Square origin : board.keySet()) {
+        Piece piece = board.get(origin);
+        if (piece.isBlack() == blackToMove) {
+          piece.generateMoves(board, origin, box, castlingOrigins, enPassantTarget,
+              pseudoLegalMovesNext);
+        }
+      }
+    }
+    boolean terminal = true;
+    for (Move moveNext : pseudoLegalMovesNext) {
+      if (makeMove(moveNext, null, null)) {
+        terminal = false;
+      }
+      unmakeMove();
+      if (!terminal) {
+        break;
+      }
+    }
+    int nChecks = 0;
+    Move nullMove = new NullMove();
+    doMakeMove(nullMove);
+    for (Square origin : board.keySet()) {
+      Piece piece = board.get(origin);
+      if (piece.isBlack() == blackToMove) {
+        if (!piece.generateMoves(board, origin, box, castlingOrigins, enPassantTarget, null)) {
+          nChecks++;
+        }
+      }
+    }
+    unmakeMove();
+    if (terminal) {
+      if (nChecks > 0) {
+        if (nChecks > 1) {
+          for (int i = 0; i < nChecks; i++) {
+            lanBuilder.append("+");
+          }
+        }
+        lanBuilder.append("#");
+      } else {
+        lanBuilder.append("=");
+      }
+    } else {
+      if (nChecks > 0) {
+        for (int i = 0; i < nChecks; i++) {
+          lanBuilder.append("+");
+        }
+      }
+    }
+  }
+
+  public String toFormattedString(String operation) {
+    return Piece.formatToString(board, blackToMove, castlingOrigins, enPassantTarget, operation);
   }
 
   @Override

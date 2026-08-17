@@ -28,5 +28,9 @@ import blog.art.chess.metonym.position.Position;
 
 public interface Move {
 
-  boolean doMake(Position position, StringBuilder lanBuilder);
+  void preWrite(Position position, StringBuilder lanBuilder);
+
+  boolean preMake(Position position);
+
+  void updateState(Position position);
 }

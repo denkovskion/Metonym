@@ -83,7 +83,7 @@ public class Perft extends Problem {
   }
 
   @Override
-  public String getSummary() {
+  protected String getSummary() {
     return String.format("Perft at depth %d", nPlies);
   }
 

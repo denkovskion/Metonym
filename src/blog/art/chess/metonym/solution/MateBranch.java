@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.StringJoiner;
 
-public final class MateBranch extends Node {
+public final class MateBranch implements Node {
 
   private final Move move;
   private final int distance;
@@ -47,7 +47,8 @@ public final class MateBranch extends Node {
   }
 
   @Override
-  protected void doFormat(Position position, StringBuilder output, int moveNo, boolean inline) {
+  public String toFormattedString(Position position, int moveNo, boolean inline) {
+    StringBuilder output = new StringBuilder();
     if (position.isBlackToMove()) {
       if (!inline) {
         output.append(moveNo).append("...");
@@ -64,10 +65,12 @@ public final class MateBranch extends Node {
         output.append(System.lineSeparator()).append(String.join("",
             Collections.nCopies(position.isBlackToMove() ? moveNo - 1 : moveNo, "\t")));
       }
-      child.doFormat(position, output, position.isBlackToMove() ? moveNo : moveNo + 1, first);
+      output.append(
+          child.toFormattedString(position, position.isBlackToMove() ? moveNo : moveNo + 1, first));
       first = false;
     }
     position.unmakeMove();
+    return output.toString();
   }
 
   @Override

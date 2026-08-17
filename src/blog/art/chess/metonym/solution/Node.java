@@ -25,21 +25,8 @@
 package blog.art.chess.metonym.solution;
 
 import blog.art.chess.metonym.position.Position;
-import java.util.StringJoiner;
 
-public abstract class Node {
+public interface Node {
 
-  protected abstract void doFormat(Position position, StringBuilder output, int moveNo,
-      boolean inline);
-
-  public static String formatToString(Node node, Position position) {
-    StringBuilder output = new StringBuilder();
-    node.doFormat(position, output, 1, false);
-    return output.toString();
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", Node.class.getSimpleName() + "[", "]").toString();
-  }
+  String toFormattedString(Position position, int moveNo, boolean inline);
 }

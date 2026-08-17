@@ -47,7 +47,7 @@ public final class Pawn extends Piece {
   }
 
   @Override
-  public boolean generateMoves(Square origin, Map<Square, Piece> board, Map<Section, Piece> box,
+  public boolean generateMoves(Map<Square, Piece> board, Square origin, Map<Section, Piece> box,
       Set<Square> castlingOrigins, Square enPassantTarget, List<Move> moves) {
     List<Direction> captureDirections = Arrays.asList(new Direction(-1, black ? -1 : 1),
         new Direction(1, black ? -1 : 1));

@@ -27,14 +27,14 @@ package blog.art.chess.metonym.solution;
 import blog.art.chess.metonym.position.Position;
 import java.util.StringJoiner;
 
-public final class IllegalNode extends Node {
+public final class IllegalNode implements Node {
 
   public IllegalNode() {
   }
 
   @Override
-  protected void doFormat(Position position, StringBuilder output, int moveNo, boolean inline) {
-    output.append("Illegal position");
+  public String toFormattedString(Position position, int moveNo, boolean inline) {
+    return "Illegal position";
   }
 
   @Override
