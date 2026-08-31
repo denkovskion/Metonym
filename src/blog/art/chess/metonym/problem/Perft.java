@@ -47,14 +47,13 @@ public class Perft extends Problem {
   }
 
   @Override
-  protected Node doSolve(Position position, List<Move> pseudoLegalMoves, boolean detailed,
-      boolean verbose) {
+  protected Node solve(List<Move> pseudoLegalMoves, boolean detailed, boolean verbose) {
     List<Node> nodes = detailed ? new ArrayList<>() : null;
-    long nNodes = count(nPlies, position, pseudoLegalMoves, nodes, verbose);
+    long nNodes = count(position, nPlies, pseudoLegalMoves, nodes, verbose);
     return detailed ? new DivideRoot(nNodes, nodes) : new PerftNode(nNodes);
   }
 
-  private static long count(int nPlies, Position position, List<Move> pseudoLegalMoves,
+  private static long count(Position position, int nPlies, List<Move> pseudoLegalMoves,
       List<Node> nodes, boolean verbose) {
     if (nPlies == 0) {
       return 1;
@@ -64,7 +63,7 @@ public class Perft extends Problem {
       List<Move> pseudoLegalMovesNext = new ArrayList<>();
       StringBuilder lanBuilder = verbose ? new StringBuilder() : null;
       if (position.makeMove(move, pseudoLegalMovesNext, lanBuilder)) {
-        long nChildNodes = count(nPlies - 1, position, pseudoLegalMovesNext, null, false);
+        long nChildNodes = count(position, nPlies - 1, pseudoLegalMovesNext, null, false);
         if (nodes != null) {
           nodes.add(new DivideLeaf(move, nChildNodes));
         }
@@ -90,6 +89,6 @@ public class Perft extends Problem {
   @Override
   public String toString() {
     return new StringJoiner(", ", Perft.class.getSimpleName() + "[", "]").add("nPlies=" + nPlies)
-        .add(super.toString()).toString();
+        .add("position=" + position).toString();
   }
 }

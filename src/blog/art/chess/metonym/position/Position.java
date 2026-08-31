@@ -105,7 +105,7 @@ public class Position {
       move.preWrite(this, lanBuilder);
     }
     boolean preLegal = move.preMake(this);
-    doMakeMove(move);
+    makeMove(move);
     if (preLegal) {
       if (isLegal(pseudoLegalMoves)) {
         if (lanBuilder != null) {
@@ -117,7 +117,7 @@ public class Position {
     return false;
   }
 
-  private void doMakeMove(Move move) {
+  private void makeMove(Move move) {
     memory.addFirst(new State(new TreeMap<>(board), blackToMove, new HashSet<>(castlingOrigins),
         enPassantTarget));
     move.updateState(this);
@@ -155,7 +155,7 @@ public class Position {
     }
     int nChecks = 0;
     Move nullMove = new NullMove();
-    doMakeMove(nullMove);
+    makeMove(nullMove);
     for (Square origin : board.keySet()) {
       Piece piece = board.get(origin);
       if (piece.isBlack() == blackToMove) {

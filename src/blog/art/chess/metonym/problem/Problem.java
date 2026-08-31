@@ -38,7 +38,7 @@ public abstract class Problem {
 
   private static final Logger LOGGER = Logger.getLogger(Problem.class.getName());
 
-  private final Position position;
+  protected final Position position;
 
   protected Problem(Position position) {
     this.position = position;
@@ -50,10 +50,10 @@ public abstract class Problem {
     System.out.println();
     LOGGER.info(detailed ? "Solving with analysis..." : "Solving...");
     long begin = System.currentTimeMillis();
-    List<Move> pseudoLegalMoves = new ArrayList<>();
     Node solution;
+    List<Move> pseudoLegalMoves = new ArrayList<>();
     if (position.isLegal(pseudoLegalMoves)) {
-      solution = doSolve(position, pseudoLegalMoves, detailed, verbose);
+      solution = solve(pseudoLegalMoves, detailed, verbose);
     } else {
       solution = new IllegalNode();
     }
@@ -62,8 +62,7 @@ public abstract class Problem {
     LOGGER.info(String.format("Finished solving in %dms.", end - begin));
   }
 
-  protected abstract Node doSolve(Position position, List<Move> pseudoLegalMoves, boolean detailed,
-      boolean verbose);
+  protected abstract Node solve(List<Move> pseudoLegalMoves, boolean detailed, boolean verbose);
 
   protected abstract String getSummary();
 

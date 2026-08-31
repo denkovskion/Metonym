@@ -49,13 +49,12 @@ public class MateSearch extends Problem {
   }
 
   @Override
-  protected Node doSolve(Position position, List<Move> pseudoLegalMoves, boolean detailed,
-      boolean verbose) {
-    List<Node> nodes = analyse(nMoves, position, pseudoLegalMoves, detailed, verbose);
+  protected Node solve(List<Move> pseudoLegalMoves, boolean detailed, boolean verbose) {
+    List<Node> nodes = analyse(position, nMoves, pseudoLegalMoves, detailed, verbose);
     return new MateRoot(nodes);
   }
 
-  private static List<Node> analyse(int nMoves, Position position, List<Move> pseudoLegalMoves,
+  private static List<Node> analyse(Position position, int nMoves, List<Move> pseudoLegalMoves,
       boolean detailed, boolean verbose) {
     List<Node> nodes = new ArrayList<>();
     if (detailed) {
@@ -75,7 +74,7 @@ public class MateSearch extends Problem {
               if (position.makeMove(moveMin, pseudoLegalMovesMax, null)) {
                 int max = searchMax(position, distanceMax - 1, pseudoLegalMovesMax, true);
                 int distanceMin = distanceMax - max;
-                List<Node> nodesMax = analyse(distanceMin, position, pseudoLegalMovesMax, true,
+                List<Node> nodesMax = analyse(position, distanceMin, pseudoLegalMovesMax, true,
                     false);
                 nodesMin.add(new MateBranch(moveMin, distanceMin, nodesMax));
               }
@@ -184,6 +183,6 @@ public class MateSearch extends Problem {
   @Override
   public String toString() {
     return new StringJoiner(", ", MateSearch.class.getSimpleName() + "[", "]").add(
-        "nMoves=" + nMoves).add(super.toString()).toString();
+        "nMoves=" + nMoves).add("position=" + position).toString();
   }
 }
