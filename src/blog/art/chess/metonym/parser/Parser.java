@@ -57,74 +57,73 @@ public class Parser {
     Scanner records = new Scanner(System.in);
     while (records.hasNextLine()) {
       String line = records.nextLine();
-      if (!line.trim().isEmpty()) {
-        try (Scanner fields = new Scanner(line)) {
+      try {
+        Scanner fields = new Scanner(line);
+        if (fields.hasNext()) {
           Map<String, Piece> pieces = new HashMap<>();
           Map<Square, Piece> board = new HashMap<>();
-          try (Scanner characters = new Scanner(fields.next())) {
-            characters.useDelimiter("");
-            for (int rank = 8; rank >= 1; rank--) {
-              for (int file = 1; file <= 8; file++) {
-                if (characters.hasNext("[" + "12345678".substring(0, 8 - (file - 1)) + "]")) {
-                  file += characters.nextInt();
-                  if (file > 8) {
-                    break;
-                  }
-                }
-                String letter = characters.next("[KQRBNPkqrbnp]");
-                switch (letter) {
-                  case "K":
-                    board.put(new Square(file, rank),
-                        pieces.computeIfAbsent(letter, k -> new King(false)));
-                    break;
-                  case "Q":
-                    board.put(new Square(file, rank),
-                        pieces.computeIfAbsent(letter, k -> new Queen(false)));
-                    break;
-                  case "R":
-                    board.put(new Square(file, rank),
-                        pieces.computeIfAbsent(letter, k -> new Rook(false)));
-                    break;
-                  case "B":
-                    board.put(new Square(file, rank),
-                        pieces.computeIfAbsent(letter, k -> new Bishop(false)));
-                    break;
-                  case "N":
-                    board.put(new Square(file, rank),
-                        pieces.computeIfAbsent(letter, k -> new Knight(false)));
-                    break;
-                  case "P":
-                    board.put(new Square(file, rank),
-                        pieces.computeIfAbsent(letter, k -> new Pawn(false)));
-                    break;
-                  case "k":
-                    board.put(new Square(file, rank),
-                        pieces.computeIfAbsent(letter, k -> new King(true)));
-                    break;
-                  case "q":
-                    board.put(new Square(file, rank),
-                        pieces.computeIfAbsent(letter, k -> new Queen(true)));
-                    break;
-                  case "r":
-                    board.put(new Square(file, rank),
-                        pieces.computeIfAbsent(letter, k -> new Rook(true)));
-                    break;
-                  case "b":
-                    board.put(new Square(file, rank),
-                        pieces.computeIfAbsent(letter, k -> new Bishop(true)));
-                    break;
-                  case "n":
-                    board.put(new Square(file, rank),
-                        pieces.computeIfAbsent(letter, k -> new Knight(true)));
-                    break;
-                  case "p":
-                    board.put(new Square(file, rank),
-                        pieces.computeIfAbsent(letter, k -> new Pawn(true)));
-                    break;
+          Scanner characters = new Scanner(fields.next()).useDelimiter("");
+          for (int rank = 8; rank >= 1; rank--) {
+            for (int file = 1; file <= 8; file++) {
+              if (characters.hasNext("[" + "12345678".substring(0, 8 - (file - 1)) + "]")) {
+                file += characters.nextInt();
+                if (file > 8) {
+                  break;
                 }
               }
-              characters.skip(rank > 1 ? "/" : "$");
+              String letter = characters.next("[KQRBNPkqrbnp]");
+              switch (letter) {
+                case "K":
+                  board.put(new Square(file, rank),
+                      pieces.computeIfAbsent(letter, k -> new King(false)));
+                  break;
+                case "Q":
+                  board.put(new Square(file, rank),
+                      pieces.computeIfAbsent(letter, k -> new Queen(false)));
+                  break;
+                case "R":
+                  board.put(new Square(file, rank),
+                      pieces.computeIfAbsent(letter, k -> new Rook(false)));
+                  break;
+                case "B":
+                  board.put(new Square(file, rank),
+                      pieces.computeIfAbsent(letter, k -> new Bishop(false)));
+                  break;
+                case "N":
+                  board.put(new Square(file, rank),
+                      pieces.computeIfAbsent(letter, k -> new Knight(false)));
+                  break;
+                case "P":
+                  board.put(new Square(file, rank),
+                      pieces.computeIfAbsent(letter, k -> new Pawn(false)));
+                  break;
+                case "k":
+                  board.put(new Square(file, rank),
+                      pieces.computeIfAbsent(letter, k -> new King(true)));
+                  break;
+                case "q":
+                  board.put(new Square(file, rank),
+                      pieces.computeIfAbsent(letter, k -> new Queen(true)));
+                  break;
+                case "r":
+                  board.put(new Square(file, rank),
+                      pieces.computeIfAbsent(letter, k -> new Rook(true)));
+                  break;
+                case "b":
+                  board.put(new Square(file, rank),
+                      pieces.computeIfAbsent(letter, k -> new Bishop(true)));
+                  break;
+                case "n":
+                  board.put(new Square(file, rank),
+                      pieces.computeIfAbsent(letter, k -> new Knight(true)));
+                  break;
+                case "p":
+                  board.put(new Square(file, rank),
+                      pieces.computeIfAbsent(letter, k -> new Pawn(true)));
+                  break;
+              }
             }
+            characters.skip(rank > 1 ? "/" : "$");
           }
           Map<Section, Piece> box = new HashMap<>();
           if (pieces.containsKey("P")) {
@@ -194,13 +193,13 @@ public class Parser {
                   new Position(board, box, blackToMove, castlingOrigins, enPassantTarget), nMoves));
               break;
           }
-        } catch (IllegalArgumentException ex) {
-          LOGGER.warning(String.format("Not accepted line: '%s'. %s.", line, ex.getMessage()));
-          return new ArrayList<>();
-        } catch (NoSuchElementException ex) {
-          LOGGER.warning(String.format("Invalid line: '%s'.", line));
-          return new ArrayList<>();
         }
+      } catch (IllegalArgumentException ex) {
+        LOGGER.warning(String.format("Not accepted line: '%s'. %s.", line, ex.getMessage()));
+        return new ArrayList<>();
+      } catch (NoSuchElementException ex) {
+        LOGGER.warning(String.format("Invalid line: '%s'.", line));
+        return new ArrayList<>();
       }
     }
     return problems;
